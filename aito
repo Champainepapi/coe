@@ -1,0 +1,59 @@
+-- Example Script for Recording Macro, Auto Placing, Selling, Upgrading, and Playing Infinite Mode
+
+-- Table to store recorded positions
+local recordedPositions = {}
+
+-- Function to record position
+local function recordPosition()
+    local mouse = game:GetService("Players").LocalPlayer:GetMouse()
+    table.insert(recordedPositions, mouse.Hit.p)
+end
+
+-- Bind record position function to a key (e.g., "R")
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.R then
+        recordPosition()
+    end
+end)
+
+-- Function to auto sell
+local function autoSell()
+    for _, item in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
+        if item:FindFirstChild("SellValue") then
+            game:GetService("ReplicatedStorage").SellItem:FireServer(item)
+        end
+    end
+end
+
+-- Function to auto upgrade
+local function autoUpgrade()
+    for _, char in pairs(game:GetService("Players").LocalPlayer.Characters:GetChildren()) do
+        if char:FindFirstChild("UpgradeCost") then
+            game:GetService("ReplicatedStorage").UpgradeCharacter:FireServer(char)
+        end
+    end
+end
+
+-- Function to auto place
+local function autoPlace()
+    local itemToPlace = "YourItemName"  -- Replace with the actual item name or identifier
+    for _, position in pairs(recordedPositions) do
+        game:GetService("ReplicatedStorage").PlaceItem:FireServer(itemToPlace, position)
+    end
+end
+
+-- Function to auto play infinite mode
+local function autoPlayInfinite()
+    while game:GetService("Players").LocalPlayer.PlayerGui.InfiniteMode.Enabled do
+        game:GetService("ReplicatedStorage").PlayInfiniteMode:FireServer()
+    end
+end
+
+-- Main loop to execute functions
+while true do
+    autoSell()
+    autoUpgrade()
+    autoPlace()
+    autoPlayInfinite()
+    wait(10)  -- Wait before repeating
+end
